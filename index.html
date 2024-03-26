@@ -10,19 +10,41 @@
   .input-group label { display: block; margin-bottom: 5px; }
   .input-group input, .input-group select, button {
     width: 100%;
-    font-size: 18px; padding: 15px; margin: 5px 0;
+    font-size: 18px;
+    padding: 15px;
+    margin: 5px 0;
   }
   button {
-    background-color: #007BFF; color: white; border: none;
-    border-radius: 5px; cursor: pointer; font-weight: bold;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
   }
-  #resultModal { display: none; position: fixed; z-index: 1; left: 0; top: 0;
-    width: 100%; height: 100%; overflow: auto; background-color: rgb(0,0,0);
-    background-color: rgba(0,0,0,0.4); padding-top: 60px; }
-  .modal-content { background-color: #fefefe; margin: 5% auto; padding: 20px;
-    border: 1px solid #888; width: 80%; }
-  .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
-  .close:hover, .close:focus { color: black; text-decoration: none; cursor: pointer; }
+  .modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    padding-top: 60px;
+  }
+  .modal-content {
+    background-color: #fefefe;
+    margin: 5% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
+  }
+  .modal-content p {
+    font-size: 20px; /* Larger font size */
+  }
 </style>
 </head>
 <body>
@@ -51,11 +73,11 @@
 </div>
 <button onclick="calculate()">计算</button>
 
-<div id="resultModal" class="modal">
+<!-- The Modal -->
+<div id="myModal" class="modal">
   <div class="modal-content">
-    <span class="close">&times;</span>
-    <p id="resultText"></p >
-    <button onclick="copyResult()">复制结果</button>
+    <p id="modalText">Some text in the Modal..</p >
+    <button onclick="resetForm()">重新计算</button>
   </div>
 </div>
 
@@ -65,47 +87,39 @@
     const fabricWidth = parseFloat(document.getElementById('fabricWidth').value);
     const curtainType = document.getElementById('curtainType').value;
     const addWidth = parseInt(document.getElementById('addWidth').value, 10);
-    let finishedCurtainWidth = curtainType === 'split' ? windowWidth / 2 + addWidth : windowWidth + addWidth;
+
+    let finishedCurtainWidth;
+    if (curtainType === 'split') {
+      finishedCurtainWidth = windowWidth / 2 + addWidth;
+    } else {
+      finishedCurtainWidth = windowWidth + addWidth;
+    }
+    
     const foldMaterial = fabricWidth - finishedCurtainWidth;
     const numberOfFolds = Math.floor(finishedCurtainWidth * 0.07);
     const sizeOfFold = numberOfFolds > 0 ? (foldMaterial / numberOfFolds).toFixed(1) : 0;
     const spacingBetweenFolds = numberOfFolds > 1 ? (finishedCurtainWidth / (numberOfFolds - 1)).toFixed(1) : 0;
 
     const resultText = `成品帘宽: ${finishedCurtainWidth.toFixed(2)} cm<br>折用料: ${foldMaterial.toFixed(2)} cm<br>折个数: ${numberOfFolds}<br>折大小: ${sizeOfFold} cm<br>折间距: ${spacingBetweenFolds} cm`;
-    document.getElementById('resultText').innerHTML = resultText.replace(/<br>/g, "\\n");
+
+    document.getElementById('modalText').innerHTML = resultText;
     showModal();
   }
 
+  function resetForm() {
+    document.getElementById('windowWidth').value = '';
+    document.getElementById('fabricWidth').value = '';
+    document.getElementById('curtainType').value = 'split';
+    document.getElementById('addWidth').value = '20';
+    hideModal();
+  }
+
   function showModal() {
-    var modal = document.getElementById("resultModal");
-    modal.style.display = "block";
+    document.getElementById('myModal').style.display = "block";
   }
 
-  function copyResult() {
-    const resultText
-      function copyResult() {
-    const resultText = document.getElementById("resultText").innerText;
-    navigator.clipboard.writeText(resultText).then(() => {
-      alert("结果已复制到剪贴板");
-    }, (err) => {
-      console.error('复制失败', err);
-    });
-  }
-
-  // 关闭模态框的逻辑
-  var modal = document.getElementById("resultModal");
-  var span = document.getElementsByClassName("close")[0];
-
-  // 点击(x)，关闭模态框
-  span.onclick = function() {
-    modal.style.display = "none";
-  }
-
-  // 点击模态框外部，关闭模态框
-  window.onclick = function(event) {
-    if (event.target == modal) {
-      modal.style.display = "none";
-    }
+  function hideModal() {
+    document.getElementById('myModal').style.display = "none";
   }
 </script>
 </body>
